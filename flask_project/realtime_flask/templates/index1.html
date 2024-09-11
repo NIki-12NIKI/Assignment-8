@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Rooms</title>
+</head>
+<body>
+    <h2>Welcome, {{ current_user.username }}</h2>
+    <a href="{{ url_for('chat', room='room1') }}">Join Room 1</a><br>
+    <a href="{{ url_for('chat', room='room2') }}">Join Room 2</a><br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>

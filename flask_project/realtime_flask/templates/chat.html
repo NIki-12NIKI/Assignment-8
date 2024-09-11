@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <style>
+        #messages { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Chat Room: {{ room }}</h2>
+    <div id="messages">
+        {% for message in messages %}
+            <p><strong>{{ message.username }}:</strong> {{ message.message }}</p>
+        {% endfor %}
+    </div>
+    <p id="typing"></p>
+    <input type="text" id="message" placeholder="Type a message">
+    <button id="send">Send</button>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var room = "{{ room }}";
+
+        socket.emit('join', {'room': room});
+
+        // Handle receiving messages
+        socket.on('receive_message', function(data) {
+            var messageDiv = document.getElementById('messages');
+            messageDiv.innerHTML += '<p><strong>' + data.username + ':</strong> ' + data.message + '</p>';
+        });
+
+        // Handle typing
+        socket.on('typing', function(data) {
+            document.getElementById('typing').innerHTML = data;
+        });
+
+        // Send message
+        document.getElementById('send').onclick = function() {
+            var message = document.getElementById('message').value;
+            socket.emit('send_message', {'room': room, 'message': message});
+            document.getElementById('message').value = '';
+        };
+
+        // Typing indicator
+        document.getElementById('message').oninput = function() {
+            socket.emit('typing', {'room': room});
+        };
+    </script>
+</body>
+</html>

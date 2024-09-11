@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Notifications</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #notifications { border: 1px solid #ccc; padding: 10px; width: 300px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Real-Time Notifications</h1>
+    <div id="notifications">
+        <h3>Notifications:</h3>
+        <ul id="notification-list"></ul>
+    </div>
+    
+    <form id="send-form">
+        <input type="text" id="notification-input" placeholder="Enter a notification" />
+        <button type="submit">Send Notification</button>
+    </form>
+
+    <script>
+        // Connect to the WebSocket server
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        // Log when connected to WebSocket
+        socket.on('connect', function() {
+            console.log('Connected to WebSocket');
+        });
+
+        // Listen for notification event from the server
+        // Listen for notifications
+        socket.on('receive_notification', function(data) {
+            console.log("Notification received:", data.notification);  // Log received notifications
+        });
+
+        // Send a notification using the form
+        document.getElementById('send-form').onsubmit = function(e) {
+            e.preventDefault();
+            var notification = document.getElementById('notification-input').value;
+            console.log('Sending notification:', notification);  // Log sending event
+            socket.emit('send_notification', { 'notification': notification });  // Emit notification event
+            document.getElementById('notification-input').value = '';  // Clear input field
+        };
+    </script>
+</body>
+</html>
